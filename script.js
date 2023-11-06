@@ -1,20 +1,61 @@
-const myLibrary = [];
+// const myLibrary = [];
 
-// Object constructor
-function Book(title, author, pages, isread) {
-  this.title = title;
-  this.author = author;
-  this.pages = pages;
-  this.isread = isread;
+// Used ES6 classes instead of object constructors
+class Book {
+  constructor(title, author, pages, isread) {
+    this.title = title;
+    this.author = author;
+    this.pages = pages;
+    this.isread = isread;
+  }
+
+  toogleRead() {
+    this.isread = !this.isread;
+  }
 }
 
-Book.prototype.toogleRead = function () {
-    this.isread = !this.isread
+class Library {
+  constructor() {
+    this.books = [];
+  }
+
+  addBook(title, author, pages, isread) {
+    let newBook = new Book(title, author, pages, isread);
+    this.books.push(newBook);
+  }
+
+  removeBook(index) {
+    this.books.splice(index, 1);
+  }
+
+  displayBooksOnPage() {
+    let Books = document.getElementById("books");
+    Books.innerHTML = "";
+
+    // Loop over the books array
+    for (let i = 0; i < this.books.length; i++) {
+      let book = this.books[i];
+      let bookElement = document.createElement("div"); // This line creates a new HTML element using javascript
+      bookElement.classList.add("book-card"); // This line adds a CSS class to the newly created `div` element
+      bookElement.innerHTML = `
+        <h3>${book.title}</h3>
+        <p>Author: ${book.author}</p>
+        <p>Pages: ${book.pages}</p>
+        <p>Read: ${book.isread ? "Yes" : "No"}</p>
+        <button class="remove-btn" onclick=remove(${i}) >Remove</button>
+        <button class="isread-btn" onclick=toogleRead(${i})>Read</button>
+        `;
+      Books.appendChild(bookElement);
+    }
+  }
 }
+
+// created single instance of the `Library` class called `myLibrary`
+const myLibrary = new Library();
 
 function toogleRead(index) {
-    myLibrary[index].toogleRead();
-    displayBooksOnPage();
+  myLibrary.books[index].toogleRead();
+  myLibrary.displayBooksOnPage();
 }
 
 function addBookToLibrary() {
@@ -27,42 +68,19 @@ function addBookToLibrary() {
   let author = authorInput.value;
   let pages = pagesInput.value;
 
-  let newBook = new Book(title, author, pages, isread);
-  myLibrary.push(newBook);
-  displayBooksOnPage();
+  myLibrary.addBook(title, author, pages, isread);
+  myLibrary.displayBooksOnPage();
 
-  titleInput.value = ""
-  authorInput.value = ""
-  pagesInput.value = ""
+  titleInput.value = "";
+  authorInput.value = "";
+  pagesInput.value = "";
 
   closeForm();
 }
 
-function displayBooksOnPage() {
-  let Books = document.getElementById("books");
-  Books.innerHTML = "";
-
-  // Loop over the Library array and display to
-  for (let i = 0; i < myLibrary.length; i++) {
-    let book = myLibrary[i];
-    let bookElement = document.createElement("div"); // This line creates a new HTML element using javascript
-    bookElement.classList.add("book-card"); // This line adds a CSS class to the newly created `div` element
-    bookElement.innerHTML = `
-        <h3>${book.title}</h3>
-        <p>Author: ${book.author}</p>
-        <p>Pages: ${book.pages}</p>
-        <p>Read: ${book.isread ? "Yes" : "No"}</p>
-        <button class="remove-btn" onclick=remove(${i}) >Remove</button>
-        <button class="isread-btn" onclick=toogleRead(${i})>Read</button>
-        `;
-    Books.appendChild(bookElement);
-  }
-}
-
 function remove(index) {
-    console.log(index)
-    myLibrary.splice(index, 1)
-    displayBooksOnPage()
+  myLibrary.removeBook(index)
+  myLibrary.displayBooksOnPage();
 }
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -83,8 +101,6 @@ document.addEventListener("DOMContentLoaded", function () {
   closeButton.addEventListener("click", function () {
     closeForm();
   });
-
-
 });
 
 function closeForm() {
